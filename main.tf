@@ -9,9 +9,11 @@ module "Networking" {
   private_rt                  = var.private_rt
 }
 module "Compute" {
-  source                      = "./modules/Compute"
-  rent_habesha_private_subnet = module.Networking.rent_habesha_private_subnet
-  enviroment                  = var.enviroment
-  cluster_version             = var.cluster_version
-  worker_node_policy          = var.worker_node_policy
+  source                        = "./modules/Compute"
+  rent_habesha_vpc              = module.Networking.rent_habesha_vpc
+  rent_habesha_private_subnet   = module.Networking.rent_habesha_private_subnet
+  enviroment                    = var.enviroment
+  cluster_version               = var.cluster_version
+  worker_node_policy            = var.worker_node_policy
+  rent_habesha_alb_ingress_rule = var.rent_habesha_alb_ingress_rule
 }

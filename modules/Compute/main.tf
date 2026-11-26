@@ -28,7 +28,7 @@ resource "aws_eks_cluster" "rent_habesha_eks_cluster" {
   name = "rent-habesha-cluster"
   access_config {
     authentication_mode = "API"
-    bootstrap_cluster_creator_admin_permissions = true
+    bootstrap_cluster_creator_admin_permissions = true # 
   }
   role_arn = aws_iam_role.rent_habesha_eks_iam_role.arn
   version = var.cluster_version
@@ -89,4 +89,35 @@ resource "aws_eks_node_group" "rent_habesha_node_group" {
     aws_iam_role_policy_attachment.rent_habesha_worker_node_policy_attachment
    ]
 }
+
+resource "aws_security_group" "rent_habesha_alb_sg" {
+  vpc_id = var.rent_habesha_vpc
+  tags = {
+    enviroment = var.enviroment
+  }
+}
+resource "aws_security_group" "rent_habesha_worker_node_sg" {
+  vpc_id = var.rent_habesha_vpc
+  tags = {
+    enviroment = var.enviroment
+  }
+}
+
+# ----Fix VPC referrencing on module
+resource "aws_vpc_security_group_ingress_rule" "rent_habesha_alb_ingress" {
+  for_each = var.rent_habesha_alb_ingress_rule
+  security_group_id = aws_security_group.rent_habesha_alb_sg.id
+  cidr_ipv4 = each.value.cidr_ipv4
+  from_port = each.value.from_port
+  to_port = each.value.to_port
+  ip_protocol = each.value.ip_protocol
+}
+
+//----------------Need to be configured once the destination port identified (WN or Application)
+# resource "aws_vpc_security_group_egress_rule" "rent_habesha_alb_egress" {
+#   security_group_id = aws_security_group.rent_habesha_alb_sg.id
+#   from_port = 
+#   to_port = 
+#   ip_protocol = 
+# }
 
